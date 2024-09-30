@@ -1,17 +1,57 @@
-<div>로그인</div>
-<form id="login-form" action="/login" method="POST">
-  <div>
-    <label for="id">아이디</label>
-    <input type="text" id="id" name="id" required />
-  </div>
+<script>
+  import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+  import { user$ } from "../store";
 
-  <div>
-    <label for="password">비밀번호</label>
-    <input type="password" id="password" name="password" required />
-  </div>
-</form>
+  const provider = new GoogleAuthProvider();
+  const auth = getAuth();
+
+  const loginWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      const user = result.user;
+      user$.set(user);
+      localStorage.setItem("token", token);
+    } catch (error) {
+      // 수정된 부분
+      console.error(error);
+    }
+  };
+</script>
 
 <div>
-  <button type="submit">로그인</button>
+  <div class="login-title">로그인</div>
+  <button class="login-btn" on:click={loginWithGoogle}>
+    <img
+      class="google-img"
+      src="https://img.icons8.com/color/200/google-logo.png"
+      alt=""
+    />
+    <div>Google로 시작하기</div>
+  </button>
 </div>
-<div id="info"></div>
+
+<style>
+  .login-title {
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  .google-img {
+    width: 20px;
+  }
+  .login-btn {
+    width: 200px;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    padding: 5px 10px 5px 10px;
+    cursor: pointer;
+  }
+</style>
